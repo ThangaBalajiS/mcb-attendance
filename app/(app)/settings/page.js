@@ -1,4 +1,4 @@
-import Settings from '../components/Settings';
+import Settings from '../../components/Settings';
 
 export const metadata={title:'Settings'};
 

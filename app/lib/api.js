@@ -3,6 +3,10 @@ export async function api(path,options){
  try{r=await fetch('/api'+path,{headers:{'Content-Type':'application/json'},...options})}
  catch{throw new Error('Cannot reach the server. Is it still running?')}
  const data=await r.json().catch(()=>null);
+ if(r.status===401&&typeof window!=='undefined'){
+  window.location.href='/login?next='+encodeURIComponent(window.location.pathname);
+  throw new Error(data?.error||'Your session has expired.');
+ }
  if(!r.ok)throw new Error(data?.error||`Request failed (${r.status})`);
  return data;
 }

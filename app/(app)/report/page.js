@@ -1,4 +1,4 @@
-import Report from '../components/Report';
+import Report from '../../components/Report';
 
 export const metadata={title:'Reports'};
 

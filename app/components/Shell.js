@@ -1,8 +1,8 @@
 'use client';
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
-import {usePathname} from 'next/navigation';
-import {CalendarDays, ClipboardList, Settings as SettingsIcon, Sun, Moon, TriangleAlert, RotateCcw, Clock3} from 'lucide-react';
+import {usePathname,useRouter} from 'next/navigation';
+import {CalendarDays, ClipboardList, Settings as SettingsIcon, Sun, Moon, TriangleAlert, RotateCcw, Clock3, LogOut} from 'lucide-react';
 import {ToastProvider,useToast} from './Toasts';
 import {ConfirmProvider} from './Confirm';
 import {StoreProvider,useStoreContext} from '../lib/StoreProvider';
@@ -24,8 +24,10 @@ function Chrome({children}){
  const store=useStoreContext();
  const toast=useToast();
  const pathname=usePathname()||'';
+ const router=useRouter();
  const [theme,setTheme]=useState(null);
  const [retrying,setRetrying]=useState(false);
+ const [signingOut,setSigningOut]=useState(false);
 
  useEffect(()=>{
   const root=document.documentElement;
@@ -37,6 +39,13 @@ function Chrome({children}){
   document.documentElement.dataset.theme=next;
   document.cookie=`mcb-theme=${next};path=/;max-age=31536000;samesite=lax`;
   setTheme(next);
+ }
+
+ async function signOut(){
+  setSigningOut(true);
+  try{await fetch('/api/auth/logout',{method:'POST'})}catch{}
+  router.replace('/login');
+  router.refresh();
  }
 
  async function retry(){
@@ -70,6 +79,9 @@ function Chrome({children}){
      <div className="today"><Clock3 size={15}/>{longDate(today())}</div>
      <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle dark mode" title="Toggle dark mode">
       {theme==='dark'?<Sun size={17}/>:<Moon size={17}/>}
+     </button>
+     <button className="icon-btn" onClick={signOut} disabled={signingOut} aria-label="Sign out" title="Sign out">
+      <LogOut size={17}/>
      </button>
     </div>
    </header>

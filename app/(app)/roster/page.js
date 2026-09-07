@@ -1,4 +1,4 @@
-import Roster from '../components/Roster';
+import Roster from '../../components/Roster';
 
 export const metadata={title:'Roster'};
 
