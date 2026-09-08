@@ -39,7 +39,7 @@ export default function Report(){
   const m={};
   rows.forEach(r=>{
    const g=m[r.id]??(m[r.id]={id:r.id,name:r.name,days:0,vals:{},total:0,payable:0});
-   g.days++;g.total+=r.total;g.payable+=Math.min(r.total,1)*r.salary;
+   g.days++;g.total+=r.total;g.payable+=r.total*r.salary;
    Object.entries(r.vals).forEach(([k,v])=>{g.vals[k]=(g.vals[k]||0)+v});
   });
   return Object.values(m).sort((a,b)=>a.name.localeCompare(b.name));
@@ -47,7 +47,7 @@ export default function Report(){
 
  const summary=useMemo(()=>{
   let present=0,payable=0;
-  rows.forEach(r=>{const d=Math.min(r.total,1);present+=d;payable+=d*r.salary});
+  rows.forEach(r=>{present+=r.total;payable+=r.total*r.salary});
   return {days:rows.length,present,payable,people:new Set(rows.map(r=>r.id)).size};
  },[rows]);
 
@@ -58,7 +58,7 @@ export default function Report(){
    ?['S.No','Date','Day','Employee','ID',...shiftCols,'Total value','Payable days','Payable salary']
    :['S.No','Employee','ID','Days present',...shiftCols,'Total value','Payable salary'];
   const body=view==='day'
-   ?rows.map((r,i)=>[i+1,fmtDate(r.date),weekday(r.date),r.name,r.id,...shifts.map(s=>r.vals[s.id]??''),r.total,Math.min(r.total,1),Math.min(r.total,1)*r.salary])
+   ?rows.map((r,i)=>[i+1,fmtDate(r.date),weekday(r.date),r.name,r.id,...shifts.map(s=>r.vals[s.id]??''),r.total,r.total,r.total*r.salary])
    :byEmployee.map((g,i)=>[i+1,g.name,g.id,g.days,...shifts.map(s=>g.vals[s.id]??''),g.total,g.payable]);
   downloadCSV(`mcb-attendance-${from}_to_${to}.csv`,[
    head,...body,[],
@@ -115,7 +115,7 @@ export default function Report(){
          <td>{r.name}</td><td className="muted">{r.id}</td>
          {shifts.map(s=><td key={s.id} className="numeric">{r.vals[s.id]??<span className="muted">—</span>}</td>)}
          <td className="numeric"><b>{num(r.total)}</b></td>
-         <td className="numeric">{money(Math.min(r.total,1)*r.salary)}</td>
+         <td className="numeric">{money(r.total*r.salary)}</td>
         </tr>):<tr><td colSpan={6+shifts.length} className="empty">No attendance logged in this range.</td></tr>}
        </tbody></table>
       :<table><thead><tr>
@@ -143,7 +143,7 @@ export default function Report(){
       ?(rows.length?rows.map(r=><div key={r.key} className="mcard">
         <div className="mcard-top"><b>{r.name}</b><span>{fmtDate(r.date)} · {weekday(r.date)}</span></div>
         <div className="mcard-vals">{shifts.filter(s=>r.vals[s.id]).map(s=><em key={s.id}>{s.code} {r.vals[s.id]}</em>)}</div>
-        <div className="mcard-foot"><span>Total value <b>{num(r.total)}</b></span><b>{money(Math.min(r.total,1)*r.salary)}</b></div>
+        <div className="mcard-foot"><span>Total value <b>{num(r.total)}</b></span><b>{money(r.total*r.salary)}</b></div>
        </div>):<p className="empty">No attendance logged in this range.</p>)
       :(byEmployee.length?byEmployee.map(g=><div key={g.id} className="mcard">
         <div className="mcard-top"><b>{g.name}</b><span>{g.id}</span></div>

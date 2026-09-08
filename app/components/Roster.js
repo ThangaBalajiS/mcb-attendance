@@ -34,7 +34,7 @@ export default function Roster(){
    const set=logged[e.id];
    if(!set?.size)return;
    const t=valueOf(set);
-   covered++;value+=t;payable+=Math.min(t,1)*e.salary;
+   covered++;value+=t;payable+=t*e.salary;
   });
   return {covered,value,payable};
  },[employees,logged,shifts]);
